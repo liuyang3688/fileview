@@ -1,0 +1,7 @@
+*.class
+.idea/
+.settings/
+out/
+temp/
+target/
+/**/upload/
