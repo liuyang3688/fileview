@@ -50,21 +50,40 @@ public class IndexController {
         String path = request.getServletContext().getRealPath(fNamePath);
 
         File[] fileList = new File(path).listFiles();
+        Arrays.sort(fileList, new Comparator< File>(){
+            public int compare(File f1, File f2) {
+                long diff = f1.lastModified() - f2.lastModified();
+                if (diff > 0)
+                    return -1;
+                else if (diff == 0)
+                    return 0;
+                else
+                    return 1;
+            }
+            public boolean equals(Object obj) {
+                return true;
+            }
+        });
         model.addAttribute("title", fNamePath);
         List<Map<String, String>> fileInfoList = new ArrayList<>();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        for (File file : fileList) {
-            try {
-                Map<String, String> map = new HashMap<>();
-                map.put("fileName", file.getName());
-                map.put("filePath", fNamePath + "/" + file.getName());
-                String dateTime=df.format(new Date(file.lastModified()));
-                map.put("lastModified", dateTime);
-                fileInfoList.add(map);
-            } catch (Exception e) {
-                e.printStackTrace();
+        try{
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            for (File file : fileList) {
+                try {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("fileName", file.getName());
+                    map.put("filePath", fNamePath + "/" + file.getName());
+                    String dateTime=df.format(new Date(file.lastModified()));
+                    map.put("lastModified", dateTime);
+                    fileInfoList.add(map);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        } catch( Exception e ) {
+            e.printStackTrace();
         }
+
         // 读取upload目录
         model.addAttribute("fileInfoList", fileInfoList);
         return "list";
